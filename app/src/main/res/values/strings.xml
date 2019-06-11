@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SecretNotifications</string>
+    <string name="StartBtn">Start Secret Mode</string>
+    <string name="EndBtn">End Secret Mode</string>
+    <string name="StartTxt">start text</string>
+    <string name="EndTxt">end text</string>
+</resources>

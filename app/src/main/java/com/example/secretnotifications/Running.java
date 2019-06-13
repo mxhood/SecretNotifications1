@@ -8,19 +8,32 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.view.HapticFeedbackConstants;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class Running extends AppCompatActivity {
+
+    private final int VOLUME_UP = 1;
+    private final int VOLUME_DOWN = 2;
+    private final int ASSISTANT = 3;
+    private final int SCREEN_TOUCH = 4;
+
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_running);
+        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         turnOnSilentMode(this);
         turnOffScreen();
         collectNotifications();
-        monitorTouch();
     }
 
     protected void turnOnSilentMode(Context context) {
@@ -58,17 +71,44 @@ public class Running extends AppCompatActivity {
 
     }
 
-    private void monitorTouch() {
-        boolean sensorTriggered = false;
-
-        if (sensorTriggered) {
-            sendResponse();
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch(keyCode){
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                Toast.makeText(this,"Volume Up Pressed", Toast.LENGTH_SHORT).show();
+                sendResponse(VOLUME_UP);
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                Toast.makeText(this,"Volume Down Pressed", Toast.LENGTH_SHORT).show();
+                sendResponse(VOLUME_DOWN);
+                return true;
+            case KeyEvent.KEYCODE_VOICE_ASSIST:
+                Toast.makeText(this,"Assistant Pressed", Toast.LENGTH_SHORT).show();
+                sendResponse(ASSISTANT);
+                return true;
         }
+        return super.onKeyDown(keyCode, event);
     }
 
-    private void sendResponse() {
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        Toast.makeText(this, "Touch press on x: " + x + " y: "+y, Toast.LENGTH_SHORT).show();
+        sendResponse(SCREEN_TOUCH);
+        return true;
+    }
+
+    private void sendResponse(int buttonPressed) {
         // analyze notifications
         // buzz phone
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.EFFECT_HEAVY_CLICK));
+            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
+        } else {
+            vibrator.vibrate(200);
+            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void endRunning(View view) {

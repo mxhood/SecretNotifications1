@@ -63,6 +63,22 @@ public class Running extends AppCompatActivity {
         }
     }
 
+    // Turn off Do not Disturb
+    protected void turnOffSilentMode(Context context) {
+        NotificationManager notificationManager =
+                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+
+        try {
+            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+        }
+    }
+
     private void turnOffScreen() {
 
     }
@@ -76,15 +92,27 @@ public class Running extends AppCompatActivity {
         switch(keyCode){
             case KeyEvent.KEYCODE_VOLUME_UP:
                 Toast.makeText(this,"Volume Up Pressed", Toast.LENGTH_SHORT).show();
-                sendResponse(VOLUME_UP);
+                try {
+                    sendResponse(VOLUME_UP);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 Toast.makeText(this,"Volume Down Pressed", Toast.LENGTH_SHORT).show();
-                sendResponse(VOLUME_DOWN);
+                try {
+                    sendResponse(VOLUME_DOWN);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return true;
             case KeyEvent.KEYCODE_VOICE_ASSIST:
                 Toast.makeText(this,"Assistant Pressed", Toast.LENGTH_SHORT).show();
-                sendResponse(ASSISTANT);
+                try {
+                    sendResponse(ASSISTANT);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -95,20 +123,51 @@ public class Running extends AppCompatActivity {
         float x = event.getX();
         float y = event.getY();
         Toast.makeText(this, "Touch press on x: " + x + " y: "+y, Toast.LENGTH_SHORT).show();
-        sendResponse(SCREEN_TOUCH);
+        try {
+            sendResponse(SCREEN_TOUCH);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         return true;
     }
 
-    private void sendResponse(int buttonPressed) {
+    private void sendResponse(int buttonPressed) throws InterruptedException {
         // analyze notifications
+
+        // Turn off Do Not Disturb
+
+        turnOffSilentMode(this);
+        Thread.sleep(1000);
         // buzz phone
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.EFFECT_HEAVY_CLICK));
-            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
-        } else {
-            vibrator.vibrate(200);
-            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
+//        if (Build.VERSION.SDK_INT >= 26) {
+//            vibrator.vibrate(VibrationEffect.createOneShot(500, VibrationEffect.EFFECT_HEAVY_CLICK));
+//            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
+//        } else {
+//            vibrator.vibrate(500);
+//            //Toast.makeText(this, "Vibrate", Toast.LENGTH_SHORT).show();
+//        }
+
+        //customVibratePatternNoRepeat();
+
+        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator.hasVibrator()) {
+            vibrator.vibrate(500); // for 500 ms
         }
+
+        // Turn back on Do Not Disturb
+        turnOnSilentMode(this);
+    }
+
+    private void customVibratePatternNoRepeat() {
+        // 0 : Start without a delay
+        // 400 : Vibrate for 400 milliseconds
+        // 200 : Pause for 200 milliseconds
+        // 400 : Vibrate for 400 milliseconds
+        long[] mVibratePattern = new long[]{500, 400};
+
+        // -1 : Do not repeat this pattern
+        // pass 0 if you want to repeat this pattern from 0th index
+        vibrator.vibrate(mVibratePattern, -1);
     }
 
     public void endRunning(View view) {

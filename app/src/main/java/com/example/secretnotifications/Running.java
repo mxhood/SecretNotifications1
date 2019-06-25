@@ -5,32 +5,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.service.notification.NotificationListenerService;
-import android.service.notification.StatusBarNotification;
-import android.view.HapticFeedbackConstants;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.provider.Settings;
-import android.os.Bundle;
-import android.text.TextUtils;
-import android.widget.ImageView;
+
 
 public class Running extends AppCompatActivity {
 
@@ -38,122 +22,17 @@ public class Running extends AppCompatActivity {
     private final int VOLUME_DOWN = 2;
     private final int ASSISTANT = 3;
     private final int SCREEN_TOUCH = 4;
-
-    private Vibrator vibrator;
-
-    private static final String ENABLED_NOTIFICATION_LISTENERS = "enabled_notification_listeners";
-    private static final String ACTION_NOTIFICATION_LISTENER_SETTINGS = "android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS";
-
-    private ImageView interceptedNotificationImageView;
-    private ImageChangeBroadcastReceiver imageChangeBroadcastReceiver;
-    private AlertDialog enableNotificationListenerAlertDialog;
+    private Vibrator vibration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_running);
-        vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-
-        // If the user did not turn the notification listener service on we prompt him to do so
-        if(!isNotificationServiceEnabled()){
-            buildNotificationServiceAlertDialog();
-        }
-
-        // Finally we register a receiver to tell the MainActivity when a notification has been received
-        imageChangeBroadcastReceiver = new ImageChangeBroadcastReceiver();
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction("com.example.secretnotifications");
-        registerReceiver(imageChangeBroadcastReceiver,intentFilter);
+        vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
 
         turnOnSilentMode(this);
         turnOffScreen();
-        collectNotifications();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unregisterReceiver(imageChangeBroadcastReceiver);
-    }
-
-    /**
-     * Change Intercepted Notification Image
-     * Changes the MainActivity image based on which notification was intercepted
-     * @param notificationCode The intercepted notification code
-     */
-    private void changeInterceptedNotificationImage(int notificationCode){
-        Toast.makeText(this,"notification received, code: " + notificationCode, Toast.LENGTH_LONG).show();
-    }
-
-    /**
-     * Is Notification Service Enabled.
-     * Verifies if the notification listener service is enabled.
-     * Got it from: https://github.com/kpbird/NotificationListenerService-Example/blob/master/NLSExample/src/main/java/com/kpbird/nlsexample/NLService.java
-     * @return True if enabled, false otherwise.
-     */
-    private boolean isNotificationServiceEnabled(){
-        String pkgName = getPackageName();
-        final String flat = Settings.Secure.getString(getContentResolver(),
-                ENABLED_NOTIFICATION_LISTENERS);
-        if (!TextUtils.isEmpty(flat)) {
-            final String[] names = flat.split(":");
-            for (int i = 0; i < names.length; i++) {
-                final ComponentName cn = ComponentName.unflattenFromString(names[i]);
-                if (cn != null) {
-                    if (TextUtils.equals(pkgName, cn.getPackageName())) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
-    /**
-     * Image Change Broadcast Receiver.
-     * We use this Broadcast Receiver to notify the Main Activity when
-     * a new notification has arrived, so it can properly change the
-     * notification image
-     * */
-    public class ImageChangeBroadcastReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            int receivedNotificationCode = intent.getIntExtra("Notification Code",-1);
-            changeInterceptedNotificationImage(receivedNotificationCode);
-        }
-    }
-
-
-    /**
-     * Build Notification Listener Alert Dialog.
-     * Builds the alert dialog that pops up if the user has not turned
-     * the Notification Listener Service on yet.
-     * @return An alert dialog which leads to the notification enabling screen
-     */
-    private void buildNotificationServiceAlertDialog(){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
-            Intent intent = new Intent(
-                    android.provider.Settings
-                            .ACTION_NOTIFICATION_LISTENER_SETTINGS);
-
-            startActivity(intent);
-        }
-    }
-
-
-
-
-
-
-
-
-
-    // --------------------------------------
-
-
-
 
 
     protected void turnOnSilentMode(Context context) {
@@ -200,10 +79,6 @@ public class Running extends AppCompatActivity {
     }
 
     private void turnOffScreen() {
-
-    }
-
-    private void collectNotifications() {
 
     }
 
@@ -255,7 +130,7 @@ public class Running extends AppCompatActivity {
         // analyze notifications
         // Turn off Do Not Disturb
         turnOffSilentMode(Running.this);
-        Toast.makeText(this, "buzzing for "+buttonPressed, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "buzzing for "+buttonPressed, Toast.LENGTH_SHORT).show();
         Thread.sleep(1000);
         // buzz phone
 //        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -276,7 +151,7 @@ public class Running extends AppCompatActivity {
 
         // -1 : Do not repeat this pattern
         // pass 0 if you want to repeat this pattern from 0th index
-        vibrator.vibrate(mVibratePattern, -1);
+        vibration.vibrate(mVibratePattern, -1);
     }
 
     public void endRunning(View view) {

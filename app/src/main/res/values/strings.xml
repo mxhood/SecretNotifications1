@@ -2,6 +2,29 @@
     <string name="app_name">SecretNotifications</string>
     <string name="StartBtn">Start Secret Mode</string>
     <string name="EndBtn">End Secret Mode</string>
-    <string name="StartTxt">start text</string>
+    <string name="StartTxt">Choose notification\'s quantity and priority</string>
     <string name="EndTxt">end text</string>
+    <string name="NotificationListenerExampleService">NotificationListenerExampleService</string>
+
+
+    <string name="quantity_prompt_1">Priority 1</string>
+    <string name="quantity_prompt_2">Priority 2</string>
+    <string name="quantity_prompt_3">Priority 3</string>
+    <string name="quantity_prompt_4">Priority 4</string>
+    <string name="quantity_prompt_5">Priority 5</string>
+
+    <string-array name="quantity_arrays">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
 </resources>

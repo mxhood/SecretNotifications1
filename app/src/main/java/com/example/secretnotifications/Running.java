@@ -22,6 +22,11 @@ public class Running extends AppCompatActivity {
     private final int VOLUME_DOWN = 2;
     private final int ASSISTANT = 3;
     private final int SCREEN_TOUCH = 4;
+    private String spinner1_value;
+    private String spinner2_value;
+    private String spinner3_value;
+    private String spinner4_value;
+    private String spinner5_value;
     private Vibrator vibration;
 
     @Override
@@ -29,11 +34,15 @@ public class Running extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_running);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        spinner1_value = getIntent().getStringExtra("SPINNER_1");
+        spinner2_value = getIntent().getStringExtra("SPINNER_2");
+        spinner3_value = getIntent().getStringExtra("SPINNER_3");
+        spinner4_value = getIntent().getStringExtra("SPINNER_4");
+        spinner5_value = getIntent().getStringExtra("SPINNER_5");
 
         turnOnSilentMode(this);
         turnOffScreen();
     }
-
 
     protected void turnOnSilentMode(Context context) {
         // Will prompt user to give permission to turn on Do Not Disturb

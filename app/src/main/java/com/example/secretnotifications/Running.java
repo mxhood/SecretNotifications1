@@ -22,11 +22,11 @@ public class Running extends AppCompatActivity {
     private final int VOLUME_DOWN = 2;
     private final int ASSISTANT = 3;
     private final int SCREEN_TOUCH = 4;
-    private String spinner1_value;
-    private String spinner2_value;
-    private String spinner3_value;
-    private String spinner4_value;
-    private String spinner5_value;
+    private int spinner1_value;
+    private int spinner2_value;
+    private int spinner3_value;
+    private int spinner4_value;
+    private int spinner5_value;
     private Vibrator vibration;
 
     @Override
@@ -34,11 +34,11 @@ public class Running extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_running);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        spinner1_value = getIntent().getStringExtra("SPINNER_1");
-        spinner2_value = getIntent().getStringExtra("SPINNER_2");
-        spinner3_value = getIntent().getStringExtra("SPINNER_3");
-        spinner4_value = getIntent().getStringExtra("SPINNER_4");
-        spinner5_value = getIntent().getStringExtra("SPINNER_5");
+        spinner1_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_1"));
+        spinner2_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_2"));
+        spinner3_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_3"));
+        spinner4_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_4"));
+        spinner5_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_5"));
 
         turnOnSilentMode(this);
         turnOffScreen();
@@ -97,7 +97,7 @@ public class Running extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 Toast.makeText(this,"Volume Up Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(VOLUME_UP);
+                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -105,7 +105,7 @@ public class Running extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 Toast.makeText(this,"Volume Down Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(VOLUME_DOWN);
+                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -113,7 +113,7 @@ public class Running extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOICE_ASSIST:
                 Toast.makeText(this,"Assistant Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(ASSISTANT);
+                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -128,25 +128,40 @@ public class Running extends AppCompatActivity {
         float y = event.getY();
         Toast.makeText(this, "Touch press on x: " + x + " y: "+y, Toast.LENGTH_SHORT).show();
         try {
-            sendResponse(SCREEN_TOUCH);
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+            sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
         return true;
     }
 
-    private void sendResponse(int buttonPressed) throws InterruptedException {
-        // analyze notifications
+    private void sendResponse(int spin1, int spin2, int spin3, int spin4, int spin5) throws InterruptedException {
         // Turn off Do Not Disturb
         turnOffSilentMode(Running.this);
-        // Toast.makeText(this, "buzzing for "+buttonPressed, Toast.LENGTH_SHORT).show();
         Thread.sleep(1000);
-        // buzz phone
-//        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//        if (vibrator.hasVibrator()) {
-//            vibrator.vibrate(500); // for 500 ms
-//        }
+
+        if (spin1 > 0) {
+
+        }
+        if (spin2 > 0) {
+
+        }
+        if (spin3 > 0) {
+
+        }
+        if (spin4 > 0) {
+
+        }
+        if (spin5 > 0) {
+
+        }
         customVibratePatternNoRepeat();
+
         // Turn back on Do Not Disturb
         turnOnSilentMode(Running.this);
     }
@@ -156,7 +171,7 @@ public class Running extends AppCompatActivity {
         // 400 : Vibrate for 400 milliseconds
         // 200 : Pause for 200 milliseconds
         // 400 : Vibrate for 400 milliseconds
-        long[] mVibratePattern = new long[]{500, 400};
+        long[] mVibratePattern = new long[]{0, 400, 200, 400};
 
         // -1 : Do not repeat this pattern
         // pass 0 if you want to repeat this pattern from 0th index

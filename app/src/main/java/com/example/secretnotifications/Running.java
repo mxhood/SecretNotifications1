@@ -2,17 +2,18 @@ package com.example.secretnotifications;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -28,12 +29,14 @@ public class Running extends AppCompatActivity {
     private int spinner4_value;
     private int spinner5_value;
     private Vibrator vibration;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_running);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+        userId = getIntent().getStringExtra("USER_ID");
         spinner1_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_1"));
         spinner2_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_2"));
         spinner3_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_3"));
@@ -146,35 +149,60 @@ public class Running extends AppCompatActivity {
         Thread.sleep(1000);
 
         if (spin1 > 0) {
-
+            priority1Response(spin1);
         }
         if (spin2 > 0) {
-
+            priority2Response(spin2);
         }
         if (spin3 > 0) {
-
+            priority3Response(spin3);
         }
         if (spin4 > 0) {
-
+            priority4Response(spin4);
         }
         if (spin5 > 0) {
-
+            priority5Response(spin5);
         }
-        customVibratePatternNoRepeat();
 
         // Turn back on Do Not Disturb
         turnOnSilentMode(Running.this);
     }
 
-    private void customVibratePatternNoRepeat() {
-        // 0 : Start without a delay
-        // 400 : Vibrate for 400 milliseconds
-        // 200 : Pause for 200 milliseconds
-        // 400 : Vibrate for 400 milliseconds
-        long[] mVibratePattern = new long[]{0, 400, 200, 400};
+    @SuppressLint("MissingPermission")
+    private void priority1Response(int quantity) {
 
-        // -1 : Do not repeat this pattern
-        // pass 0 if you want to repeat this pattern from 0th index
+        long[] mVibratePattern;
+
+        if (quantity == 1) {
+            mVibratePattern = new long[]{0, 200, 100, 200};
+
+        } else if (quantity == 2) {
+           mVibratePattern = new long[]{0, 200, 100, 200, 100, 200};
+
+        } else {
+           mVibratePattern = new long[]{0, 200, 100, 200, 100, 200, 100, 200};
+        }
+        vibration.vibrate(mVibratePattern, -1);
+    }
+
+    @SuppressLint({"MissingPermission", "NewApi"})
+    private void priority2Response(int quantity) {
+        long[] mVibratePattern = new long[]{0, 400, 200, 400};
+        vibration.vibrate(mVibratePattern, -1);
+    }
+    @SuppressLint({"MissingPermission", "NewApi"})
+    private void priority3Response(int quantity) {
+        long[] mVibratePattern = new long[]{0, 400, 200, 400};
+        vibration.vibrate(mVibratePattern, -1);
+    }
+    @SuppressLint({"MissingPermission", "NewApi"})
+    private void priority4Response(int quantity) {
+        long[] mVibratePattern = new long[]{0, 400, 200, 400};
+        vibration.vibrate(mVibratePattern, -1);
+    }
+    @SuppressLint({"MissingPermission", "NewApi"})
+    private void priority5Response(int quantity) {
+        long[] mVibratePattern = new long[]{0, 400, 200, 400};
         vibration.vibrate(mVibratePattern, -1);
     }
 
@@ -187,6 +215,7 @@ public class Running extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        //TODO: send back to rank screen
         finish(); // terminates and return back to previous activity
     }
 }

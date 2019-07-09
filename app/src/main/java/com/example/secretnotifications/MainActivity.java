@@ -11,18 +11,14 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity {
 
     private Spinner spinner1, spinner2, spinner3, spinner4, spinner5;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        userId = getIntent().getStringExtra("USER_ID");
     }
-
-//    public void addListenerOnSpinnerItemSelection() {
-//        spinner1 = (Spinner) findViewById(R.id.spinner1);
-//        spinner1.setOnItemSelectedListener(new CustomOnItemSelectedListener());
-//    }
-
 
     public void setUpLaunch(View view) {
         spinner1 = (Spinner) findViewById(R.id.spinner1);
@@ -49,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, Running.class);
+        intent.putExtra("USER_ID", userId);
         intent.putExtra("SPINNER_1", spinner1_value);
         intent.putExtra("SPINNER_2", spinner2_value);
         intent.putExtra("SPINNER_3", spinner3_value);

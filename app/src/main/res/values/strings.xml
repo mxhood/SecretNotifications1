@@ -3,9 +3,29 @@
     <string name="StartBtn">Start Secret Mode</string>
     <string name="EndBtn">End Secret Mode</string>
     <string name="StartTxt">Choose notification\'s quantity and priority</string>
-    <string name="EndTxt">end text</string>
+    <string name="EndTxt">Press volume button to get notifications.</string>
+    <string name="StartText">Start</string>
+    <string name="userIdTxt">Enter User Id</string>
     <string name="NotificationListenerExampleService">NotificationListenerExampleService</string>
 
+    <string name="patternChooseTxt">Click buttons for vibration patterns, then rank the pattern in order of perceived urgency.</string>
+    <string name="toptxt">Top Priority</string>
+    <string name="bottomtxt">Lowest Priority</string>
+    <string name="doneTxt">Done</string>
+
+    <string name="a">A</string>
+    <string name="b">B</string>
+    <string name="c">C</string>
+    <string name="d">D</string>
+    <string name="e">E</string>
+
+    <string-array name="ranking_options">
+        <item>A</item>
+        <item>B</item>
+        <item>C</item>
+        <item>D</item>
+        <item>E</item>
+    </string-array>
 
     <string name="quantity_prompt_1">Priority 1</string>
     <string name="quantity_prompt_2">Priority 2</string>

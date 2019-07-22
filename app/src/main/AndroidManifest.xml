@@ -11,7 +11,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true">
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
 
         <activity android:name=".UserId">
             <intent-filter>
@@ -24,10 +25,18 @@
         <activity android:name=".RankPatterns">
         </activity>
 
+        <activity android:name=".RankPatternsDrag5"/>
+        <activity android:name=".RankPatternsDrag4"/>
+        <activity android:name=".RankPatternsDrag3"/>
+        <activity android:name=".RankPatternsDrag2"/>
+
         <activity android:name=".MainActivity">
         </activity>
 
         <activity android:name=".Running">
+        </activity>
+
+        <activity android:name=".EndOfExperiment">
         </activity>
 
     </application>

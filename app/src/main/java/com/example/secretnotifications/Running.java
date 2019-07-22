@@ -2,8 +2,6 @@ package com.example.secretnotifications;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
@@ -11,25 +9,35 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.util.Pair;
 import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class Running extends AppCompatActivity {
 
-    private final int VOLUME_UP = 1;
-    private final int VOLUME_DOWN = 2;
-    private final int ASSISTANT = 3;
-    private final int SCREEN_TOUCH = 4;
-    private int spinner1_value;
-    private int spinner2_value;
-    private int spinner3_value;
-    private int spinner4_value;
-    private int spinner5_value;
     private Vibrator vibration;
     private String userId;
+    public String layerA, layerB, layerC, layerD, layerE;
+    public ArrayList<String> userPatterns;
+    public ArrayList<String> currentPatternOrder;
+    public ArrayList<String> currentPatternMultipleOrder;
+    public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","B","AB"));
+    public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "A.B."));
+    public ArrayList<String> orderB = new ArrayList<>(Arrays.asList("A", "B", "C", "AB", "AC","BC","ABC"));
+    public ArrayList<String> orderBMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "C", "AB", "AC","BC","ABC"));
+    public ArrayList<String> orderC = new ArrayList<>(Arrays.asList("A", "B", "C", "D", "ACD", "ABCD", "AD", "BC"));
+    public ArrayList<String> orderCMultiple = new ArrayList<>(Arrays.asList("A...", "B..", "C", "D", "ACD", "ABCD", "AD", "BC"));
+    public ArrayList<String> orderD = new ArrayList<>(Arrays.asList("C", "E", "ABCDE", "BCE", "A", "B"));
+    public ArrayList<String> orderDMultiple = new ArrayList<>(Arrays.asList("C...", "E..", "ABCDE", "BCEA", "A", "B"));
+    public String currentOrder;
+    public Intent intent;
+    public VibrationPatterns vibrationPatterns;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,86 +45,64 @@ public class Running extends AppCompatActivity {
         setContentView(R.layout.activity_running);
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         userId = getIntent().getStringExtra("USER_ID");
-        spinner1_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_1"));
-        spinner2_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_2"));
-        spinner3_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_3"));
-        spinner4_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_4"));
-        spinner5_value = Integer.parseInt(getIntent().getStringExtra("SPINNER_5"));
+        userPatterns = getIntent().getStringArrayListExtra("ORDER");
+        currentOrder = getIntent().getStringExtra("CURRENT_ORDER");
+        vibrationPatterns = new VibrationPatterns();
 
-        turnOnSilentMode(this);
-        turnOffScreen();
-    }
-
-    protected void turnOnSilentMode(Context context) {
-        // Will prompt user to give permission to turn on Do Not Disturb
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-                && !notificationManager.isNotificationPolicyAccessGranted()) {
-
-            Intent intent = new Intent(
-                    android.provider.Settings
-                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
-
-            startActivity(intent);
+        layerA = getIntent().getStringExtra("LAYER_A_PATTERN");
+        layerB = getIntent().getStringExtra("LAYER_B_PATTERN");
+        switch (currentOrder) {
+            case "B":
+                Toast.makeText(Running.this, "assigning B", Toast.LENGTH_SHORT).show();
+                layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
+                break;
+            case "C":
+                layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
+                layerD = getIntent().getStringExtra("LAYER_D_PATTERN");
+                break;
+            case "D":
+                layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
+                layerD = getIntent().getStringExtra("LAYER_D_PATTERN");
+                layerE = getIntent().getStringExtra("LAYER_E_PATTERN");
+                break;
         }
 
-        // Turn on Do not Disturb
-        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
-        try {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
-        }
-    }
+        Toast.makeText(Running.this,
+                "layer a: " + layerA +"\n" +
+                "layer b: " + layerB +"\n" +
+                "layer c: " + layerC+"\n" +
+                "layer d: " + layerD+"\n" +
+                "layer e: " + layerE,
+                Toast.LENGTH_LONG).show();
 
-    // Turn off Do not Disturb
-    protected void turnOffSilentMode(Context context) {
-        NotificationManager notificationManager =
-                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-
-        try {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
-        }
-    }
-
-    private void turnOffScreen() {
-
+        // find out the pattern order according to currentOrder
+        currentPatternOrder = findPatternOrder(currentOrder);
+        currentPatternMultipleOrder = findMultiplePatternOrder(currentOrder);
     }
 
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch(keyCode){
             case KeyEvent.KEYCODE_VOLUME_UP:
-                Toast.makeText(this,"Volume Up Pressed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this,"Volume Up Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
+                    sendResponse();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                Toast.makeText(this,"Volume Down Pressed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this,"Volume Down Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
+                    sendResponse();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
                 return true;
             case KeyEvent.KEYCODE_VOICE_ASSIST:
-                Toast.makeText(this,"Assistant Pressed", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(this,"Assistant Pressed", Toast.LENGTH_SHORT).show();
                 try {
-                    sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
+                    sendResponse();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -125,97 +111,194 @@ public class Running extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        float x = event.getX();
-        float y = event.getY();
-        Toast.makeText(this, "Touch press on x: " + x + " y: "+y, Toast.LENGTH_SHORT).show();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    private ArrayList<String> findPatternOrder(String currentOrder) {
+        switch(currentOrder) {
+            case "A":
+                return orderA;
+            case "B":
+                return orderB;
+            case "C":
+                return orderC;
         }
-        try {
-            sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return true;
+        return orderD;
     }
 
-    private void sendResponse(int spin1, int spin2, int spin3, int spin4, int spin5) throws InterruptedException {
-        // Turn off Do Not Disturb
-        turnOffSilentMode(Running.this);
-        Thread.sleep(1000);
-
-        if (spin1 > 0) {
-            priority1Response(spin1);
+    private ArrayList<String> findMultiplePatternOrder(String currentOrder) {
+        switch(currentOrder) {
+            case "A":
+                return orderAMultiple;
+            case "B":
+                return orderBMultiple;
+            case "C":
+                return orderCMultiple;
         }
-        if (spin2 > 0) {
-            priority2Response(spin2);
-        }
-        if (spin3 > 0) {
-            priority3Response(spin3);
-        }
-        if (spin4 > 0) {
-            priority4Response(spin4);
-        }
-        if (spin5 > 0) {
-            priority5Response(spin5);
-        }
-
-        // Turn back on Do Not Disturb
-        turnOnSilentMode(Running.this);
+        return orderDMultiple;
     }
 
-    @SuppressLint("MissingPermission")
-    private void priority1Response(int quantity) {
-
-        long[] mVibratePattern;
-
-        if (quantity == 1) {
-            mVibratePattern = new long[]{0, 200, 100, 200};
-
-        } else if (quantity == 2) {
-           mVibratePattern = new long[]{0, 200, 100, 200, 100, 200};
-
+    private void sendResponse() throws InterruptedException {
+        //TODO: play patterns according to file
+        String onePattern;
+        if (currentPatternOrder.isEmpty()) {
+            Toast.makeText(this, "Done with notifications, click 'Next Step' button.", Toast.LENGTH_LONG).show();
         } else {
-           mVibratePattern = new long[]{0, 200, 100, 200, 100, 200, 100, 200};
+            onePattern = currentPatternOrder.remove(0);
+            makeVibrations(onePattern);
+//            Toast.makeText(this,"Vibrating: " + onePattern, Toast.LENGTH_SHORT).show();
         }
-        vibration.vibrate(mVibratePattern, -1);
     }
 
-    @SuppressLint({"MissingPermission", "NewApi"})
-    private void priority2Response(int quantity) {
-        long[] mVibratePattern = new long[]{0, 400, 200, 400};
-        vibration.vibrate(mVibratePattern, -1);
+    // only uses pattern A & B
+    public void makeVibrations(String patternToPlay) throws InterruptedException {
+        List<Character> vibrations;
+        char vibration;
+        char[] patternCharArray;
+
+        if (!patternToPlay.isEmpty()) {
+            patternCharArray = patternToPlay.toCharArray();
+            vibrations = new ArrayList<Character>();
+            for(char c : patternCharArray) {
+                vibrations.add(c);
+            }
+
+            while (!vibrations.isEmpty()) {
+                vibration = vibrations.remove(0);
+                switch(vibration) {
+                    case 'A':
+                        patternA(layerA);
+                        break;
+                    case 'B':
+                        patternB(layerB);
+                        break;
+                    case 'C':
+                        patternC(layerC);
+                        break;
+                    case 'D':
+                        patternD(layerD);
+                        break;
+                    case 'E':
+                        patternE(layerE);
+                        break;
+                    case '.':
+                        patternMultiple();
+                        break;
+                }
+            }
+        }
     }
-    @SuppressLint({"MissingPermission", "NewApi"})
-    private void priority3Response(int quantity) {
-        long[] mVibratePattern = new long[]{0, 400, 200, 400};
-        vibration.vibrate(mVibratePattern, -1);
+
+    public Pair<long[],int[]> getPattern(String pattern) {
+        switch (pattern) {
+            case "PATTERN_A":
+                return vibrationPatterns.vib1();
+            case "PATTERN_B":
+                return vibrationPatterns.vib2();
+            case "PATTERN_C":
+                return vibrationPatterns.vib3();
+            case "PATTERN_D":
+                return vibrationPatterns.vib4();
+        }
+        return vibrationPatterns.vib5();
     }
-    @SuppressLint({"MissingPermission", "NewApi"})
-    private void priority4Response(int quantity) {
-        long[] mVibratePattern = new long[]{0, 400, 200, 400};
-        vibration.vibrate(mVibratePattern, -1);
+
+    public void patternA(String layerA) throws InterruptedException {
+        Pair<long[],int[]> pattern = getPattern(layerA);
+        long[] mVibratePattern = pattern.first;
+        int[] amplitude = pattern.second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(1000);
     }
-    @SuppressLint({"MissingPermission", "NewApi"})
-    private void priority5Response(int quantity) {
-        long[] mVibratePattern = new long[]{0, 400, 200, 400};
-        vibration.vibrate(mVibratePattern, -1);
+    public void patternB(String layerB) throws InterruptedException {
+        Pair<long[],int[]> pattern = getPattern(layerB);
+        long[] mVibratePattern = pattern.first;
+        int[] amplitude = pattern.second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(1500);
+    }
+    public void patternC(String layerC) throws InterruptedException {
+        Pair<long[],int[]> pattern = getPattern(layerC);
+        long[] mVibratePattern = pattern.first;
+        int[] amplitude = pattern.second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(1050);
+    }
+    public void patternD(String layerD) throws InterruptedException {
+        Pair<long[],int[]> pattern = getPattern(layerD);
+        long[] mVibratePattern = pattern.first;
+        int[] amplitude = pattern.second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(800);
+    }
+    public void patternE(String layerE) throws InterruptedException {
+        Pair<long[],int[]> pattern = getPattern(layerE);
+        long[] mVibratePattern = pattern.first;
+        int[] amplitude = pattern.second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(1500);
+    }
+    public void patternMultiple() throws InterruptedException {
+        long[] mVibratePattern = vibrationPatterns.vibRepeat().first;
+        int[] amplitude = vibrationPatterns.vibRepeat().second;
+        if (Build.VERSION.SDK_INT >= 26) {
+            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+        } else {
+            vibration.vibrate(mVibratePattern, -1);
+        }
+        Thread.sleep(600);
     }
 
     public void endRunning(View view) {
-        // Turn off Do Not Disturb
-        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        try {
-            audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        if (!currentPatternMultipleOrder.isEmpty()) {
+            currentPatternOrder.removeAll(currentPatternOrder);
+            currentPatternOrder.addAll(currentPatternMultipleOrder);
+            currentPatternMultipleOrder.removeAll(currentPatternMultipleOrder);
+        } else {
+            if (userPatterns.size() > 0) {
+                currentOrder = userPatterns.remove(0);
+                Toast.makeText(this, "Orders: " + userPatterns + " currentOrder = " + currentOrder, Toast.LENGTH_LONG).show();
+                switch (currentOrder) {
+                    case "B":
+//                    Toast.makeText(this,"Going to rank: " + "B", Toast.LENGTH_SHORT).show();
+                        intent = new Intent(this, RankPatternsDrag3.class);
+                        break;
+                    case "C":
+//                    Toast.makeText(this,"Going to rank: " + "C", Toast.LENGTH_SHORT).show();
+                        intent = new Intent(this, RankPatternsDrag4.class);
+                        break;
+                    case "D":
+//                    Toast.makeText(this,"Going to rank: " + "D", Toast.LENGTH_SHORT).show();
+                        intent = new Intent(this, RankPatternsDrag5.class);
+                        break;
+                }
+                intent.putExtra("USER_ID", userId);
+                intent.putExtra("CURRENT_ORDER", currentOrder);
+                intent.putExtra("ORDER", userPatterns);
+                startActivity(intent);
 
-        //TODO: send back to rank screen
-        finish(); // terminates and return back to previous activity
+            } else {
+                Intent intentEnd = new Intent(this, EndOfExperiment.class);
+                intentEnd.putExtra("USER_ID", userId);
+                startActivity(intentEnd);
+            }
+        }
     }
 }

@@ -57,4 +57,65 @@ public class RankPatterns extends AppCompatActivity{
             startActivity(intent);
         }
     }
+
+    //    protected void turnOnSilentMode(Context context) {
+//        // Will prompt user to give permission to turn on Do Not Disturb
+//        NotificationManager notificationManager =
+//                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+//                && !notificationManager.isNotificationPolicyAccessGranted()) {
+//
+//            Intent intent = new Intent(
+//                    android.provider.Settings
+//                            .ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+//
+//            startActivity(intent);
+//        }
+//
+//        // Turn on Do not Disturb
+//        AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+//        try {
+//            audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+//        }
+//    }
+
+//    // Turn off Do not Disturb
+//    protected void turnOffSilentMode(Context context) {
+//        NotificationManager notificationManager =
+//                (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+//        AudioManager audioManager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+//
+//        try {
+//            audioManager.setRingerMode(AudioManager.RINGER_MODE_VIBRATE);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            notificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+//        }
+//    }
+
+    //    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//        float x = event.getX();
+//        float y = event.getY();
+//        Toast.makeText(this, "Touch press on x: " + x + " y: "+y, Toast.LENGTH_SHORT).show();
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        try {
+//            sendResponse(spinner1_value, spinner2_value, spinner3_value, spinner4_value, spinner5_value);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
+//        return true;
+//    }
 }

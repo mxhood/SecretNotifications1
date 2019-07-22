@@ -22,7 +22,7 @@
         android:id="@+id/end_running"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="126dp"
+        android:layout_marginTop="384dp"
         android:onClick="endRunning"
         android:text="@string/EndBtn"
         app:layout_constraintEnd_toEndOf="parent"

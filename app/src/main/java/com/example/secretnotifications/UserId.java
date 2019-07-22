@@ -18,13 +18,19 @@ public class UserId  extends AppCompatActivity {
     private String userId;
     private int numOfPatterns;
     public ArrayList<String> orderPatterns1 = new ArrayList<>(Arrays.asList("A", "B", "C"));
-    public ArrayList<String> orderPatterns2 = new ArrayList<>(Arrays.asList("B", "C", "A"));
-    public ArrayList<String> orderPatterns3 = new ArrayList<>(Arrays.asList("C", "B", "A"));
-    public ArrayList<String> orderPatterns4 = new ArrayList<>(Arrays.asList("A", "C", "B"));
-    public ArrayList<Integer> orderParticipants1 = new ArrayList<>(Arrays.asList(1, 5, 9, 13, 17, 21));
-    public ArrayList<Integer> orderParticipants2 = new ArrayList<>(Arrays.asList(2,6,10,14,18,22));
-    public ArrayList<Integer> orderParticipants3 = new ArrayList<>(Arrays.asList(3,7,11,15,19,23));
-    public ArrayList<Integer> orderParticipants4 = new ArrayList<>(Arrays.asList(4,8,12,16,20,24));
+    public ArrayList<String> orderPatterns2 = new ArrayList<>(Arrays.asList("A", "C", "B"));
+    public ArrayList<String> orderPatterns3 = new ArrayList<>(Arrays.asList("B", "A", "C"));
+    public ArrayList<String> orderPatterns4 = new ArrayList<>(Arrays.asList("B", "C", "A"));
+    public ArrayList<String> orderPatterns5 = new ArrayList<>(Arrays.asList("C", "A", "B"));
+    public ArrayList<String> orderPatterns6 = new ArrayList<>(Arrays.asList("C", "B", "A"));
+
+    public ArrayList<Integer> orderParticipants1 = new ArrayList<>(Arrays.asList(1, 7, 13, 19));
+    public ArrayList<Integer> orderParticipants2 = new ArrayList<>(Arrays.asList(2, 8, 14, 20));
+    public ArrayList<Integer> orderParticipants3 = new ArrayList<>(Arrays.asList(3, 9, 15, 21));
+    public ArrayList<Integer> orderParticipants4 = new ArrayList<>(Arrays.asList(4, 10, 16, 22));
+    public ArrayList<Integer> orderParticipants5 = new ArrayList<>(Arrays.asList(5, 11, 17, 23));
+    public ArrayList<Integer> orderParticipants6 = new ArrayList<>(Arrays.asList(6, 12, 18, 24));
+
     public ArrayList<String> userPatterns;
     public Intent intent;
 
@@ -44,9 +50,15 @@ public class UserId  extends AppCompatActivity {
             return orderPatterns2;
         } else if (orderParticipants3.contains(userId)) {
             return orderPatterns3;
-            // orderParticipants4 or others
-        } else {
+        } else if (orderParticipants4.contains(userId)) {
             return orderPatterns4;
+            // orderParticipants4 or others
+        } else if (orderParticipants5.contains(userId)) {
+            return orderPatterns5;
+
+        // orderParticipants6 or others
+        } else {
+            return orderPatterns6;
         }
     }
 

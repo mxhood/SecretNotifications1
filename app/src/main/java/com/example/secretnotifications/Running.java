@@ -30,14 +30,14 @@ public class Running extends AppCompatActivity {
     public VibrationPatterns vibrationPatterns;
     public int firstTwo;
 
-    public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","B","AB", "B", "AB", "A", "A", "AB", "B", "AB"));
-    public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "A.B.", "A..B", "B..", "A...B", "A.B...", "A.", "AB.", "A.."));
+    public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","AB","B", "A", "AB", "A", "A", "AB", "B", "AB"));
+    public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "A.B...", "A.B.", "A..B.", "B..", "A...B.", "A.B...", "A.", "A.B.", "A.."));
 
-    public ArrayList<String> orderB = new ArrayList<>(Arrays.asList("A", "AC", "C", "B", "ABC", "AB", "BC", "ABC", "AC", "C"));
-    public ArrayList<String> orderBMultiple = new ArrayList<>(Arrays.asList("A..", "A.B..", "B...", "AC.", "A...B", "AC..", "BC..", "A.B.C.", "C.", "ABC."));
+    public ArrayList<String> orderB = new ArrayList<>(Arrays.asList("A", "BC", "C", "B", "ABC", "AB", "BC", "ABC", "AC", "C"));
+    public ArrayList<String> orderBMultiple = new ArrayList<>(Arrays.asList("A..", "A.B..", "B...", "A.C.", "A...B.", "A.C..", "B.C..", "A.B.C.", "C.", "A.B.C."));
 
-    public ArrayList<String> orderC = new ArrayList<>(Arrays.asList("CD", "A", "ABCD", "D", "ACD", "ABCD", "AD", "BC", "BCD", "BD"));
-    public ArrayList<String> orderCMultiple = new ArrayList<>(Arrays.asList("A...D..", "BCD..", "AB.C", "ABD..", "A.C.D...", "AB.CD.", "A..D.", "BC...", "A.C..", "BC.D.."));
+    public ArrayList<String> orderC = new ArrayList<>(Arrays.asList("AB", "CD", "ABCD", "D", "ACD", "ABCD", "AD", "BC", "BCD", "BD"));
+    public ArrayList<String> orderCMultiple = new ArrayList<>(Arrays.asList("A...D..", "B.C.D..", "A.B.C.", "A.B.D..", "A.C.D...", "A.B.C.D.", "A..D.", "B.C...", "A.C..", "B.C.D.."));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,9 +139,40 @@ public class Running extends AppCompatActivity {
             onePattern = currentPatternOrder.remove(0);
             makeVibrations(onePattern);
             if (firstTwo < 2) {
-                Toast.makeText(this, "Vibrating: " + onePattern, Toast.LENGTH_LONG).show();
+                String text = makeToast(onePattern);
+                Toast.makeText(this, "Vibrating: " + text, Toast.LENGTH_LONG).show();
                 firstTwo++;
             }
+        }
+    }
+
+    public String makeToast(String onePattern) {
+        char[] chars = onePattern.toCharArray();
+        if (chars.length > 1) {
+            if (chars[1] == '.') {
+                List<Character> allChars = new ArrayList<Character>();
+                for (char c : chars) {
+                    allChars.add(c);
+                }
+                int count = 0;
+                String finalString = "";
+                finalString = finalString + allChars.remove(0);
+                while (!allChars.isEmpty()) {
+                    char currentChar = allChars.remove(0);
+                    if (currentChar != '.') {
+                        finalString = finalString + count + " " + currentChar;
+                        count = 0;
+                    } else {
+                        count++;
+                    }
+                }
+                finalString = finalString + count;
+                return finalString;
+            } else {
+                return onePattern;
+            }
+        } else {
+            return onePattern;
         }
     }
 
@@ -185,15 +216,15 @@ public class Running extends AppCompatActivity {
     public int getDuration(String pattern) {
         switch (pattern) {
             case "PATTERN_A":
-                return 1100;
+                return 1500;
             case "PATTERN_B":
-                return 1600;
+                return 2000;
             case "PATTERN_C":
-                return 1150;
+                return 1500;
             case "PATTERN_D":
-                return 900;
+                return 1500;
             case "PATTERN_E":
-                return 1600;
+                return 2000;
             case "MULTI":
                 return 500;
         }
@@ -215,33 +246,42 @@ public class Running extends AppCompatActivity {
         {
             while (!vibrations.isEmpty()) {
                 char vibration = vibrations.remove(0);
+                boolean last = false;
+                if (!vibrations.isEmpty()) {
+                    if (vibrations.get(0) != '.') {
+                        last = true;
+                    }
+                }
 
                 switch(vibration) {
                     case 'A':
-                        vibrate(layerA);
+                        vibrate(layerA, false);
                         break;
                     case 'B':
-                        vibrate(layerB);
+                        vibrate(layerB, false);
                         break;
                     case 'C':
-                        vibrate(layerC);
+                        vibrate(layerC, false);
                         break;
                     case 'D':
-                        vibrate(layerD);
+                        vibrate(layerD, false);
                         break;
                     case '.':
-                        vibrate("MULTI");
+                        vibrate("MULTI", last);
                         break;
                 }
             }
         }
 
-        private void vibrate(String layer)
+        private void vibrate(String layer, boolean last)
         {
             Pair<long[],int[]> pattern = getPattern(layer);
             long[] mVibratePattern = pattern.first;
             int[] amplitude = pattern.second;
             int duration = getDuration(layer);
+            if (last) {
+                duration = 1500;
+            }
             if (Build.VERSION.SDK_INT >= 26) {
                 vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
             } else {
@@ -268,18 +308,20 @@ public class Running extends AppCompatActivity {
                 currentOrder = userPatterns.remove(0);
                 Toast.makeText(this, "Orders: " + userPatterns + " currentOrder = " + currentOrder, Toast.LENGTH_LONG).show();
                 switch (currentOrder) {
+                    case "A":
+                        intent = new Intent(this, RankPatternsDrag2.class);
+                        break;
+
                     case "B":
 //                    Toast.makeText(this,"Going to rank: " + "B", Toast.LENGTH_SHORT).show();
                         intent = new Intent(this, RankPatternsDrag3.class);
                         break;
+
                     case "C":
 //                    Toast.makeText(this,"Going to rank: " + "C", Toast.LENGTH_SHORT).show();
                         intent = new Intent(this, RankPatternsDrag4.class);
                         break;
-//                    case "D":
-////                    Toast.makeText(this,"Going to rank: " + "D", Toast.LENGTH_SHORT).show();
-//                        intent = new Intent(this, RankPatternsDrag5.class);
-//                        break;
+//
                 }
                 intent.putExtra("USER_ID", userId);
                 intent.putExtra("CURRENT_ORDER", currentOrder);

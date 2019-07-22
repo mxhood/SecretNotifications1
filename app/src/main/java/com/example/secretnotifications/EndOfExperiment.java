@@ -30,7 +30,6 @@ public class EndOfExperiment extends AppCompatActivity {
         String file2Name = "user" + userId + "Order2.txt";
         String file3Name = "user" + userId + "Order3.txt";
         String file4Name = "user" + userId + "Order4.txt";
-        String file5Name = "user" + userId + "Order5.txt";
 
         StringBuffer fileContent = new StringBuffer("");
 
@@ -40,8 +39,7 @@ public class EndOfExperiment extends AppCompatActivity {
         fileContent = addToFinalTxt(fileContent, file3Name);
         fileContent.append("\nOrder 4:\n");
         fileContent = addToFinalTxt(fileContent, file4Name);
-        fileContent.append("\nOrder 5:\n");
-        fileContent = addToFinalTxt(fileContent, file5Name);
+
 
 //        try {
 //            fis = this.openFileInput( file2Name );

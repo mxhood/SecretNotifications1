@@ -3,12 +3,14 @@
     <string name="StartBtn">Start Secret Mode</string>
     <string name="EndBtn">Next stage</string>
     <string name="StartTxt">Choose notification\'s quantity and priority</string>
-    <string name="EndTxt">Press volume button to get notifications.</string>
+    <string name="EndTxt">Press the volume button to get notifications.\nYour task is to yell out letters that match the vibrations you selected in the previous window. \"A\" is your highest priority vibration, followed by \"B\", and so forth.\nThere may be more than one vibration in a sequence. Sequences are always in order of priority. For example, \"A\" can be followed by any category, but \"B\" cannot be followed by \"A\".\n\nYour first two tasks are practice. The correct answers will appear on the bottom of the screen when the vibrations are triggered.</string>
+    <string name="ConditionTxt">Current condition:</string>
+    <string name="ConditionIndex"></string>
     <string name="StartText">Start</string>
     <string name="userIdTxt">Enter User Id</string>
     <string name="NotificationListenerExampleService">NotificationListenerExampleService</string>
 
-    <string name="patternChooseTxt">Click buttons for vibration patterns, then drag to rank in order of perceived urgency.</string>
+    <string name="patternChooseTxt">Click buttons for vibration patterns. Choose %1$s of them that you think are the easiest to distinguish. Drag to rank in order of perceived urgency.</string>
     <string name="toptxt">Top Priority</string>
     <string name="bottomtxt">Lowest Priority</string>
     <string name="doneTxt">Done</string>
@@ -53,6 +55,6 @@
         <item>10</item>
     </string-array>
 
-    <string name="endAppTxt">End of the experiment, thank you for participating.</string>
+    <string name="endAppTxt">All the tasks are finished! The experiment conductor will now guide you further. Do not close this window.</string>
 
 </resources>

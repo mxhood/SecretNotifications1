@@ -2,6 +2,7 @@ package com.example.secretnotifications;
 import android.content.ClipData;
 import android.content.ClipDescription;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Build;
@@ -13,6 +14,7 @@ import android.view.DragEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -33,6 +35,8 @@ public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragL
     public Intent intent;
     public ArrayList<String> userPatterns;
     public VibrationPatterns vibrationPatterns;
+
+    private TextView instructionsTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +65,11 @@ public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragL
         btn5 = (Button) findViewById(R.id.btnE);
         btn5.setTag("PATTERN_E");
         btn5.setOnLongClickListener(this);
+
+        Resources res = getResources();
+        String instructionsText = String.format(res.getString(R.string.patternChooseTxt), "5");
+        instructionsTextView = (TextView) findViewById(R.id.lbl);
+        instructionsTextView.setText(instructionsText);
 
         //Set Drag Event Listeners for defined layouts
         findViewById(R.id.layoutA).setOnDragListener(this);

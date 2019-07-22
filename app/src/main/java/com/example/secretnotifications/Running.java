@@ -10,7 +10,11 @@ import android.os.Vibrator;
 import android.util.Pair;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,7 +32,13 @@ public class Running extends AppCompatActivity {
     public String currentOrder;
     public Intent intent;
     public VibrationPatterns vibrationPatterns;
-    public int firstTwo;
+
+    private Button nextStageButton;
+
+    private boolean vibrationRunning;
+
+    private TextView currentConditionText, currentConditionIndexText, currentlyVibratingText;
+    private int currentTaskIndex;
 
     public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","AB","B", "A", "AB", "A", "A", "AB", "B", "AB"));
     public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "A.B...", "A.B.", "A..B.", "B..", "A...B.", "A.B...", "A.", "A.B.", "A.."));
@@ -48,7 +58,24 @@ public class Running extends AppCompatActivity {
         userPatterns = getIntent().getStringArrayListExtra("ORDER");
         currentOrder = getIntent().getStringExtra("CURRENT_ORDER");
         vibrationPatterns = new VibrationPatterns();
-        firstTwo = 0;
+
+        currentTaskIndex = 0;
+        vibrationRunning = false;
+
+        currentConditionText = (TextView) findViewById(R.id.currentConditionTextView);
+        currentConditionIndexText = (TextView) findViewById(R.id.conditionIndexTextView);
+        currentlyVibratingText = (TextView) findViewById(R.id.currentlyVibratingTextView);
+        currentlyVibratingText.setVisibility(View.INVISIBLE);
+
+        // Only allow going to the next stage with a long click. This is to prevent accidental presses.
+        nextStageButton = (Button) findViewById(R.id.end_running);
+        nextStageButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                endRunning(v);
+                return true;
+            }
+        });
 
         layerA = getIntent().getStringExtra("LAYER_A_PATTERN");
         layerB = getIntent().getStringExtra("LAYER_B_PATTERN");
@@ -73,6 +100,9 @@ public class Running extends AppCompatActivity {
         // find out the pattern order according to currentOrder
         currentPatternOrder = findPatternOrder(currentOrder);
         currentPatternMultipleOrder = findMultiplePatternOrder(currentOrder);
+
+        setCurrentConditionText("");
+        setCurrentConditionTaskText();
     }
 
     @Override
@@ -106,6 +136,37 @@ public class Running extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    private void setCurrentConditionText(String additionalText)
+    {
+        switch (currentOrder) {
+            case "A":
+                currentConditionText.setText("2 patterns " + additionalText);
+                break;
+            case "B":
+                currentConditionText.setText("3 patterns " + additionalText);
+                break;
+            case "C":
+                currentConditionText.setText("4 patterns " + additionalText);
+                break;
+        }
+    }
+
+    private void setCurrentConditionTaskText()
+    {
+        if (currentTaskIndex <= 1)
+        {
+            currentConditionIndexText.setText("Current task: " + (currentTaskIndex + 1) + " (practice)");
+        }
+        else if (currentTaskIndex >= 10)
+        {
+            currentConditionIndexText.setText("Tasks finished.");
+        }
+        else
+        {
+            currentConditionIndexText.setText("Current task: " + (currentTaskIndex + 1) + "");
+        }
+    }
+
     private ArrayList<String> findPatternOrder(String currentOrder) {
         switch(currentOrder) {
             case "A":
@@ -135,13 +196,21 @@ public class Running extends AppCompatActivity {
         String onePattern;
         if (currentPatternOrder.isEmpty()) {
             Toast.makeText(this, "Done with notifications, click 'Next Step' button.", Toast.LENGTH_LONG).show();
-        } else {
+        }
+        // Do not trigger anything if vibrations are running at the moment.
+        else if (vibrationRunning)
+        {
+            return;
+        }
+        else {
+
+            currentlyVibratingText.setVisibility(View.VISIBLE);
+
             onePattern = currentPatternOrder.remove(0);
             makeVibrations(onePattern);
-            if (firstTwo < 2) {
+            if (currentTaskIndex < 2) {
                 String text = makeToast(onePattern);
                 Toast.makeText(this, "Vibrating: " + text, Toast.LENGTH_LONG).show();
-                firstTwo++;
             }
         }
     }
@@ -244,7 +313,10 @@ public class Running extends AppCompatActivity {
         @Override
         public void run()
         {
+            vibrationRunning = true;
+
             while (!vibrations.isEmpty()) {
+
                 char vibration = vibrations.remove(0);
                 boolean last = false;
                 if (!vibrations.isEmpty()) {
@@ -271,6 +343,19 @@ public class Running extends AppCompatActivity {
                         break;
                 }
             }
+
+            // Sleep a bit more just in case before allowing vibrations to be triggered again.
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            vibrationRunning = false;
+            currentlyVibratingText.setVisibility(View.INVISIBLE);
+
+            currentTaskIndex++;
+            setCurrentConditionTaskText();
         }
 
         private void vibrate(String layer, boolean last)
@@ -298,11 +383,21 @@ public class Running extends AppCompatActivity {
     }
 
     public void endRunning(View view) {
+
+        // Do not go forward if a vibration pattern is running.
+        if (vibrationRunning)
+        {
+            return;
+        }
+
         if (!currentPatternMultipleOrder.isEmpty()) {
             currentPatternOrder.removeAll(currentPatternOrder);
             currentPatternOrder.addAll(currentPatternMultipleOrder);
             currentPatternMultipleOrder.removeAll(currentPatternMultipleOrder);
-            firstTwo = 0;
+
+            currentTaskIndex = 0;
+            setCurrentConditionText("+ number of categories");
+            setCurrentConditionTaskText();
         } else {
             if (userPatterns.size() > 0) {
                 currentOrder = userPatterns.remove(0);

@@ -17,10 +17,10 @@ public class UserId  extends AppCompatActivity {
     private EditText mEdit;
     private String userId;
     private int numOfPatterns;
-    public ArrayList<String> orderPatterns1 = new ArrayList<>(Arrays.asList("A", "B", "D", "C"));
-    public ArrayList<String> orderPatterns2 = new ArrayList<>(Arrays.asList("B", "C", "A", "D"));
-    public ArrayList<String> orderPatterns3 = new ArrayList<>(Arrays.asList("C", "D", "B", "A"));
-    public ArrayList<String> orderPatterns4 = new ArrayList<>(Arrays.asList("D", "A", "C", "B"));
+    public ArrayList<String> orderPatterns1 = new ArrayList<>(Arrays.asList("A", "B", "C"));
+    public ArrayList<String> orderPatterns2 = new ArrayList<>(Arrays.asList("B", "C", "A"));
+    public ArrayList<String> orderPatterns3 = new ArrayList<>(Arrays.asList("C", "B", "A"));
+    public ArrayList<String> orderPatterns4 = new ArrayList<>(Arrays.asList("A", "C", "B"));
     public ArrayList<Integer> orderParticipants1 = new ArrayList<>(Arrays.asList(1, 5, 9, 13, 17, 21));
     public ArrayList<Integer> orderParticipants2 = new ArrayList<>(Arrays.asList(2,6,10,14,18,22));
     public ArrayList<Integer> orderParticipants3 = new ArrayList<>(Arrays.asList(3,7,11,15,19,23));
@@ -72,9 +72,6 @@ public class UserId  extends AppCompatActivity {
                         break;
                     case "C":
                         intent = new Intent(this, RankPatternsDrag4.class);
-                        break;
-                    case "D":
-                        intent = new Intent(this, RankPatternsDrag5.class);
                         break;
                 }
 

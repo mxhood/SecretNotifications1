@@ -2,9 +2,7 @@ package com.example.secretnotifications;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
-import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
@@ -23,21 +21,23 @@ public class Running extends AppCompatActivity {
 
     private Vibrator vibration;
     private String userId;
-    public String layerA, layerB, layerC, layerD, layerE;
+    public String layerA, layerB, layerC, layerD;
     public ArrayList<String> userPatterns;
     public ArrayList<String> currentPatternOrder;
     public ArrayList<String> currentPatternMultipleOrder;
-    public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","B","AB"));
-    public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "A.B."));
-    public ArrayList<String> orderB = new ArrayList<>(Arrays.asList("A", "B", "C", "AB", "AC","BC","ABC"));
-    public ArrayList<String> orderBMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "C", "AB", "AC","BC","ABC"));
-    public ArrayList<String> orderC = new ArrayList<>(Arrays.asList("A", "B", "C", "D", "ACD", "ABCD", "AD", "BC"));
-    public ArrayList<String> orderCMultiple = new ArrayList<>(Arrays.asList("A...", "B..", "C", "D", "ACD", "ABCD", "AD", "BC"));
-    public ArrayList<String> orderD = new ArrayList<>(Arrays.asList("C", "E", "ABCDE", "BCE", "A", "B"));
-    public ArrayList<String> orderDMultiple = new ArrayList<>(Arrays.asList("C...", "E..", "ABCDE", "BCEA", "A", "B"));
     public String currentOrder;
     public Intent intent;
     public VibrationPatterns vibrationPatterns;
+    public int firstTwo;
+
+    public ArrayList<String> orderA = new ArrayList<>(Arrays.asList("A","B","AB", "B", "AB", "A", "A", "AB", "B", "AB"));
+    public ArrayList<String> orderAMultiple = new ArrayList<>(Arrays.asList("A..", "B...", "A.B.", "A..B", "B..", "A...B", "A.B...", "A.", "AB.", "A.."));
+
+    public ArrayList<String> orderB = new ArrayList<>(Arrays.asList("A", "AC", "C", "B", "ABC", "AB", "BC", "ABC", "AC", "C"));
+    public ArrayList<String> orderBMultiple = new ArrayList<>(Arrays.asList("A..", "A.B..", "B...", "AC.", "A...B", "AC..", "BC..", "A.B.C.", "C.", "ABC."));
+
+    public ArrayList<String> orderC = new ArrayList<>(Arrays.asList("CD", "A", "ABCD", "D", "ACD", "ABCD", "AD", "BC", "BCD", "BD"));
+    public ArrayList<String> orderCMultiple = new ArrayList<>(Arrays.asList("A...D..", "BCD..", "AB.C", "ABD..", "A.C.D...", "AB.CD.", "A..D.", "BC...", "A.C..", "BC.D.."));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,32 +48,27 @@ public class Running extends AppCompatActivity {
         userPatterns = getIntent().getStringArrayListExtra("ORDER");
         currentOrder = getIntent().getStringExtra("CURRENT_ORDER");
         vibrationPatterns = new VibrationPatterns();
+        firstTwo = 0;
 
         layerA = getIntent().getStringExtra("LAYER_A_PATTERN");
         layerB = getIntent().getStringExtra("LAYER_B_PATTERN");
         switch (currentOrder) {
             case "B":
-                Toast.makeText(Running.this, "assigning B", Toast.LENGTH_SHORT).show();
                 layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
                 break;
             case "C":
                 layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
                 layerD = getIntent().getStringExtra("LAYER_D_PATTERN");
                 break;
-            case "D":
-                layerC = getIntent().getStringExtra("LAYER_C_PATTERN");
-                layerD = getIntent().getStringExtra("LAYER_D_PATTERN");
-                layerE = getIntent().getStringExtra("LAYER_E_PATTERN");
-                break;
         }
 
-        Toast.makeText(Running.this,
-                "layer a: " + layerA +"\n" +
-                "layer b: " + layerB +"\n" +
-                "layer c: " + layerC+"\n" +
-                "layer d: " + layerD+"\n" +
-                "layer e: " + layerE,
-                Toast.LENGTH_LONG).show();
+//        Toast.makeText(Running.this,
+//                "layer a: " + layerA +"\n" +
+//                "layer b: " + layerB +"\n" +
+//                "layer c: " + layerC+"\n" +
+//                "layer d: " + layerD+"\n" +
+//                "layer e: " + layerE,
+//                Toast.LENGTH_LONG).show();
 
         // find out the pattern order according to currentOrder
         currentPatternOrder = findPatternOrder(currentOrder);
@@ -120,7 +115,7 @@ public class Running extends AppCompatActivity {
             case "C":
                 return orderC;
         }
-        return orderD;
+        return orderC;
     }
 
     private ArrayList<String> findMultiplePatternOrder(String currentOrder) {
@@ -132,7 +127,7 @@ public class Running extends AppCompatActivity {
             case "C":
                 return orderCMultiple;
         }
-        return orderDMultiple;
+        return orderCMultiple;
     }
 
     private void sendResponse() throws InterruptedException {
@@ -143,7 +138,10 @@ public class Running extends AppCompatActivity {
         } else {
             onePattern = currentPatternOrder.remove(0);
             makeVibrations(onePattern);
-//            Toast.makeText(this,"Vibrating: " + onePattern, Toast.LENGTH_SHORT).show();
+            if (firstTwo < 2) {
+                Toast.makeText(this, "Vibrating: " + onePattern, Toast.LENGTH_LONG).show();
+                firstTwo++;
+            }
         }
     }
 
@@ -160,29 +158,8 @@ public class Running extends AppCompatActivity {
                 vibrations.add(c);
             }
 
-            while (!vibrations.isEmpty()) {
-                vibration = vibrations.remove(0);
-                switch(vibration) {
-                    case 'A':
-                        patternA(layerA);
-                        break;
-                    case 'B':
-                        patternB(layerB);
-                        break;
-                    case 'C':
-                        patternC(layerC);
-                        break;
-                    case 'D':
-                        patternD(layerD);
-                        break;
-                    case 'E':
-                        patternE(layerE);
-                        break;
-                    case '.':
-                        patternMultiple();
-                        break;
-                }
-            }
+            VibrationThread vibrationThread = new VibrationThread(vibrations);
+            vibrationThread.start();
         }
     }
 
@@ -196,74 +173,88 @@ public class Running extends AppCompatActivity {
                 return vibrationPatterns.vib3();
             case "PATTERN_D":
                 return vibrationPatterns.vib4();
+            case "PATTERN_E":
+                return vibrationPatterns.vib5();
+            case "MULTI":
+                return vibrationPatterns.vibRepeat();
         }
-        return vibrationPatterns.vib5();
+        // CASE F
+        return vibrationPatterns.vib6();
     }
 
-    public void patternA(String layerA) throws InterruptedException {
-        Pair<long[],int[]> pattern = getPattern(layerA);
-        long[] mVibratePattern = pattern.first;
-        int[] amplitude = pattern.second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
+    public int getDuration(String pattern) {
+        switch (pattern) {
+            case "PATTERN_A":
+                return 1100;
+            case "PATTERN_B":
+                return 1600;
+            case "PATTERN_C":
+                return 1150;
+            case "PATTERN_D":
+                return 900;
+            case "PATTERN_E":
+                return 1600;
+            case "MULTI":
+                return 500;
         }
-        Thread.sleep(1000);
+        // CASE F
+        return 1600;
     }
-    public void patternB(String layerB) throws InterruptedException {
-        Pair<long[],int[]> pattern = getPattern(layerB);
-        long[] mVibratePattern = pattern.first;
-        int[] amplitude = pattern.second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
+
+    class VibrationThread extends Thread
+    {
+        List<Character> vibrations;
+
+        public VibrationThread(List<Character> _vibrations)
+        {
+            vibrations = _vibrations;
         }
-        Thread.sleep(1500);
-    }
-    public void patternC(String layerC) throws InterruptedException {
-        Pair<long[],int[]> pattern = getPattern(layerC);
-        long[] mVibratePattern = pattern.first;
-        int[] amplitude = pattern.second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
+
+        @Override
+        public void run()
+        {
+            while (!vibrations.isEmpty()) {
+                char vibration = vibrations.remove(0);
+
+                switch(vibration) {
+                    case 'A':
+                        vibrate(layerA);
+                        break;
+                    case 'B':
+                        vibrate(layerB);
+                        break;
+                    case 'C':
+                        vibrate(layerC);
+                        break;
+                    case 'D':
+                        vibrate(layerD);
+                        break;
+                    case '.':
+                        vibrate("MULTI");
+                        break;
+                }
+            }
         }
-        Thread.sleep(1050);
-    }
-    public void patternD(String layerD) throws InterruptedException {
-        Pair<long[],int[]> pattern = getPattern(layerD);
-        long[] mVibratePattern = pattern.first;
-        int[] amplitude = pattern.second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
+
+        private void vibrate(String layer)
+        {
+            Pair<long[],int[]> pattern = getPattern(layer);
+            long[] mVibratePattern = pattern.first;
+            int[] amplitude = pattern.second;
+            int duration = getDuration(layer);
+            if (Build.VERSION.SDK_INT >= 26) {
+                vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
+            } else {
+                vibration.vibrate(mVibratePattern, -1);
+            }
+
+            try {
+                Thread.sleep(duration);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
-        Thread.sleep(800);
-    }
-    public void patternE(String layerE) throws InterruptedException {
-        Pair<long[],int[]> pattern = getPattern(layerE);
-        long[] mVibratePattern = pattern.first;
-        int[] amplitude = pattern.second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
-        }
-        Thread.sleep(1500);
-    }
-    public void patternMultiple() throws InterruptedException {
-        long[] mVibratePattern = vibrationPatterns.vibRepeat().first;
-        int[] amplitude = vibrationPatterns.vibRepeat().second;
-        if (Build.VERSION.SDK_INT >= 26) {
-            vibration.vibrate(VibrationEffect.createWaveform(mVibratePattern, amplitude, -1));
-        } else {
-            vibration.vibrate(mVibratePattern, -1);
-        }
-        Thread.sleep(600);
+
     }
 
     public void endRunning(View view) {
@@ -271,6 +262,7 @@ public class Running extends AppCompatActivity {
             currentPatternOrder.removeAll(currentPatternOrder);
             currentPatternOrder.addAll(currentPatternMultipleOrder);
             currentPatternMultipleOrder.removeAll(currentPatternMultipleOrder);
+            firstTwo = 0;
         } else {
             if (userPatterns.size() > 0) {
                 currentOrder = userPatterns.remove(0);
@@ -284,10 +276,10 @@ public class Running extends AppCompatActivity {
 //                    Toast.makeText(this,"Going to rank: " + "C", Toast.LENGTH_SHORT).show();
                         intent = new Intent(this, RankPatternsDrag4.class);
                         break;
-                    case "D":
-//                    Toast.makeText(this,"Going to rank: " + "D", Toast.LENGTH_SHORT).show();
-                        intent = new Intent(this, RankPatternsDrag5.class);
-                        break;
+//                    case "D":
+////                    Toast.makeText(this,"Going to rank: " + "D", Toast.LENGTH_SHORT).show();
+//                        intent = new Intent(this, RankPatternsDrag5.class);
+//                        break;
                 }
                 intent.putExtra("USER_ID", userId);
                 intent.putExtra("CURRENT_ORDER", currentOrder);

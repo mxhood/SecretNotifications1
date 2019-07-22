@@ -26,7 +26,10 @@ public class VibrationPatterns {
         return new Pair<long[],int[]>(new long[]{0, 300}, new int[]{0,100});
     }
     public Pair<long[],int[]> vib5() {
-        return new Pair<long[],int[]>(new long[]{0, 150, 50, 600, 50, 150},new int[]{0,100,0,100,0,100});
+        return new Pair<long[],int[]>(new long[]{0, 50, 50, 50, 50, 50, 50, 50, 50, 50,50,50},new int[]{0,200,0,200,0,200,0,200,0,200,0,200});
+    }
+    public Pair<long[],int[]> vib6() {
+        return new Pair<long[],int[]>(new long[]{0, 100, 60, 600, 60, 100},new int[]{0,130,0,100,0,130});
     }
     public Pair<long[],int[]> vibRepeat() {
         return new Pair<long[],int[]>(new long[]{0, 50}, new int[]{0,150});

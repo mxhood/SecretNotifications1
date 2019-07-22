@@ -18,6 +18,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragListener, View.OnLongClickListener {
@@ -41,7 +44,6 @@ public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragL
         vibration = (Vibrator) getSystemService(VIBRATOR_SERVICE);
         userPatterns = getIntent().getStringArrayListExtra("ORDER");
         vibrationPatterns = new VibrationPatterns();
-
 
         //Find all views and set Tag to all draggable views
         btn1 = (Button) findViewById(R.id.btnA);
@@ -67,6 +69,21 @@ public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragL
         findViewById(R.id.layoutD).setOnDragListener(this);
         findViewById(R.id.layoutE).setOnDragListener(this);
         findViewById(R.id.layoutStart).setOnDragListener(this);
+    }
+
+    public void generateNoteOnSD(String sFileName, String sBody) {
+        try {
+            File gpxfile = new File(this.getFilesDir(), sFileName);
+            FileWriter writer = new FileWriter(gpxfile);
+            writer.append(sBody);
+            writer.flush();
+            writer.close();
+//            Toast.makeText(this, "Saved", Toast.LENGTH_LONG).show();
+//            Toast.makeText(this, gpxfile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(this, "failed", Toast.LENGTH_LONG).show();
+        }
     }
 
     public void onBtn1VibrationClick(View view) {
@@ -120,6 +137,9 @@ public class RankPatternsDrag5 extends AppCompatActivity implements View.OnDragL
         if (layerA == null || layerB == null || layerC == null || layerD == null || layerE == null) {
             Toast.makeText(this, "Please assign a pattern to each layer", Toast.LENGTH_SHORT).show();
         } else {
+            String sFileName = "user" + userId + "Order5.txt";
+            String sBody = "A pattern: " + layerA + "\nB pattern: " + layerB + "\nC pattern: " + layerC + "\nD pattern: " + layerD + "\nE pattern: " + layerE;
+            generateNoteOnSD(sFileName, sBody);
             intent = new Intent(this, Running.class);
             intent.putExtra("USER_ID", userId);
             intent.putExtra("CURRENT_ORDER", currentOrder);
